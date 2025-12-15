@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import taskRoutes from "./routes/task.routes";
 import { errorHandler } from "./middlewares/error.middleware";
+import { Request, Response } from "express";
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 
-app.get("/health", (_, res) => {
+app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "OK" });
 });
 

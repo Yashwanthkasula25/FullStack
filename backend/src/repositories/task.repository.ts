@@ -1,7 +1,8 @@
 import { prisma } from "../config/prisma";
 
 export const TaskRepository = {
-  create: (data: any) => prisma.task.create({ data }),
+  create: (data: any) =>
+    prisma.task.create({ data }),
 
   findById: (id: string) =>
     prisma.task.findUnique({ where: { id } }),
