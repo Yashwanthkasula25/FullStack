@@ -1,28 +1,29 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../utils/jwt";
+import jwt from "jsonwebtoken";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user: { id: string };
-    }
-  }
+export interface AuthRequest extends Request {
+  user?: { id: string };
 }
 
-export const requireAuth = (
-  req: Request,
+export const authMiddleware = (
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies?.token;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (!authHeader) {
+    return res.status(401).json({ message: "No token provided" });
   }
 
+  const token = authHeader.split(" ")[1];
+
   try {
-    const payload = verifyToken(token);
-    req.user = { id: payload.id };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      id: string;
+    };
+
+    req.user = { id: decoded.id };
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });

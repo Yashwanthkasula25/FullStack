@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { taskSchema, TaskInput } from "../utils/task.schema";
-
+import { taskSchema } from "../utils/task.schema";
+import type {TaskInput} from "../utils/task.schema";
 export default function TaskForm({
   initialData,
   onSubmit,

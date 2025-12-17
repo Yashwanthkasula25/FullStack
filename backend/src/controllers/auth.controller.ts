@@ -4,21 +4,33 @@ import { hashPassword, comparePassword } from "../utils/password";
 import { signToken } from "../utils/jwt";
 
 export const register = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  const exists = await prisma.user.findUnique({ where: { email } });
-  if (exists) return res.status(400).json({ message: "User already exists" });
+    const exists = await prisma.user.findUnique({ where: { email } });
+    if (exists) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: await hashPassword(password),
-    },
-  });
+    await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: await hashPassword(password),
+      },
+    });
 
-  res.status(201).json({ message: "User registered" });
+    return res.status(201).json({ message: "User registered" });
+
+  } catch (error: any) {
+    console.error("REGISTER ERROR:", error);
+
+    return res.status(500).json({
+      message: error?.message || "Internal server error",
+    });
+  }
 };
+
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -37,8 +49,16 @@ export const login = async (req: Request, res: Response) => {
     secure: false,
   });
 
-  res.json({ message: "Login successful" });
+  res.json({
+    access_token: token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+  });
 };
+
 
 export const logout = (_: Request, res: Response) => {
   res.clearCookie("token");

@@ -8,28 +8,28 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
-  email     String   @unique
+  email     String  @unique
   password  String
-  createdAt DateTime @default(now())
-  tasks     Task[]   @relation("AssignedTasks")
-  created   Task[]   @relation("CreatedTasks")
+
+  createdTasks  Task[] @relation("Creator")
+  assignedTasks Task[] @relation("Assignee")
 }
 
 model Task {
-  id           String   @id @default(uuid())
-  title        String
-  description  String
-  dueDate      DateTime
-  priority     String
-  status       String
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  dueDate     DateTime
+  priority    String
+  status      String
 
-  creatorId    String
-  creator      User     @relation("CreatedTasks", fields: [creatorId], references: [id])
-
+  creatorId   String
   assignedToId String
-  assignedTo   User     @relation("AssignedTasks", fields: [assignedToId], references: [id])
 
-  createdAt    DateTime @default(now())
+  creator     User @relation("Creator", fields: [creatorId], references: [id])
+  assignedTo  User @relation("Assignee", fields: [assignedToId], references: [id])
+
+  createdAt   DateTime @default(now())
 }

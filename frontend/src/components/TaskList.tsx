@@ -1,4 +1,4 @@
-import { Task } from "../types/task";
+import type { Task } from "../types/task";
 
 type Props = {
   tasks: Task[];
@@ -12,7 +12,7 @@ export default function TaskList({ tasks, onDelete, onEdit }: Props) {
       {tasks.map((task) => (
         <div
           key={task.id}
-          className="border p-4 rounded flex justify-between items-center"
+          className="border p-4 rounded flex justify-between"
         >
           <div>
             <h3 className="font-bold">{task.title}</h3>

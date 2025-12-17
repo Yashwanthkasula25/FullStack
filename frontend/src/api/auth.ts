@@ -1,16 +1,20 @@
-import api from "./axios";
+import axios from "axios";
+import type { RegisterInput } from "../utils/auth.schema";
 
-export const registerUser = (data: {
-  name: string;
+const API = axios.create({
+  baseURL: "http://localhost:5000/api/v1",
+  withCredentials: true,
+});
+
+export const registerUser = async (data: RegisterInput) => {
+  const res = await API.post("/auth/register", data);
+  return res.data;
+};
+
+export const loginUser = async (data: {
   email: string;
   password: string;
-}) => api.post("/auth/register", data);
-
-export const loginUser = (data: {
-  email: string;
-  password: string;
-}) => api.post("/auth/login", data);
-
-export const getMe = () => api.get("/auth/me");
-
-export const logoutUser = () => api.post("/auth/logout");
+}) => {
+  const res = await API.post("/auth/login", data);
+  return res.data;
+};

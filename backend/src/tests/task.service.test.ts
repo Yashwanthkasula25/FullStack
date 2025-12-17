@@ -1,4 +1,3 @@
-// 🔴 ADD THIS AT THE VERY TOP
 jest.mock("../sockets", () => ({
   emitTaskUpdate: jest.fn(),
   emitAssignment: jest.fn(),

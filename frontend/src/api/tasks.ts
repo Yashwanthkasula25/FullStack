@@ -1,19 +1,26 @@
-import api from "./axios";
+import axios from "axios";
 
-export const getTasks = (params?: {
-  status?: string;
-  priority?: string;
-  sort?: string;
-}) =>
-  api.get("/tasks", {
-    params,
-  });
+const API = axios.create({
+  baseURL: "http://localhost:5000/api",
+});
 
-export const createTask = (data: any) =>
-  api.post("/tasks", data);
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export const updateTask = (id: string, data: any) =>
-  api.put(`/tasks/${id}`, data);
+export const fetchMyTasks = async () => {
+  const res = await API.get("/tasks");
+  return res.data;
+};
 
-export const deleteTask = (id: string) =>
-  api.delete(`/tasks/${id}`);
+export const createTask = async (data: {
+  title: string;
+  description: string;
+}) => {
+  const res = await API.post("/tasks", data);
+  return res.data;
+};

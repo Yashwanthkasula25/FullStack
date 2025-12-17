@@ -1,18 +1,21 @@
 import { prisma } from "../config/prisma";
 
 export const TaskRepository = {
-  create: (data: any) =>
-    prisma.task.create({ data }),
+  create: (data: any) => {
+    return prisma.task.create({ data });
+  },
 
-  findById: (id: string) =>
-    prisma.task.findUnique({ where: { id } }),
-
-  update: (id: string, data: any) =>
-    prisma.task.update({ where: { id }, data }),
-
-  delete: (id: string) =>
-    prisma.task.delete({ where: { id } }),
-
-  findMany: (filters: any) =>
-    prisma.task.findMany(filters),
+  findByUser: (userId: string) => {
+    return prisma.task.findMany({
+      where: {
+        OR: [
+          { creatorId: userId },
+          { assignedToId: userId },
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  },
 };
