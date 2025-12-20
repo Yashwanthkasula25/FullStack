@@ -9,7 +9,7 @@ export const TaskRepository = {
     return prisma.task.findMany({
       where: {
         OR: [
-          { creatorId: userId },
+          { userId: userId },
           { assignedToId: userId },
         ],
       },
