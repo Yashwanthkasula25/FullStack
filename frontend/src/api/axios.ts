@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  // DELETE the import.meta.env line
+  // PASTE your Render URL explicitly:
+  baseURL: "https://fullstack-5rb5.onrender.com/api/v1", 
   withCredentials: true,
 });
 
