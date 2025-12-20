@@ -2,55 +2,69 @@ import { Response } from "express";
 import { prisma } from "../config/prisma";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
-/**
- * CREATE TASK
- */
 export const createTask = async (req: AuthRequest, res: Response) => {
-  try {
-    const { title, description } = req.body;
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    const task = await prisma.task.create({
-      data: {
-        title,
-        description,
-        dueDate: new Date(),
-        priority: "MEDIUM",
-        status: "PENDING",
+  const { title, description } = req.body;
 
-        // relations (REQUIRED by Prisma schema)
-        creator: {
-          connect: { id: req.user!.id },
-        },
-        assignedTo: {
-          connect: { id: req.user!.id },
-        },
-      },
-    });
+  const task = await prisma.task.create({
+    data: {
+      title,
+      description,
+      status: "PENDING",
+      userId: req.user.id,
+    },
+  });
 
-    res.status(201).json(task);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to create task" });
-  }
+  res.status(201).json(task);
 };
 
-/**
- * GET MY TASKS
- */
 export const getMyTasks = async (req: AuthRequest, res: Response) => {
-  try {
-    const tasks = await prisma.task.findMany({
-      where: {
-        assignedToId: req.user!.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
-    res.json(tasks);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to fetch tasks" });
+  const tasks = await prisma.task.findMany({
+    where: { userId: req.user.id },
+    orderBy: { createdAt: "desc" },
+  });
+
+  res.json(tasks);
+};
+
+export const toggleTaskStatus = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+
+  const task = await prisma.task.findUnique({ where: { id } });
+  if (!task) return res.status(404).json({ message: "Not found" });
+
+  const updated = await prisma.task.update({
+    where: { id },
+    data: {
+      status: task.status === "COMPLETED" ? "PENDING" : "COMPLETED",
+    },
+  });
+
+  res.json(updated);
+};
+export const updateTask = async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
+
+  const { id } = req.params;
+  const { title, description } = req.body;
+
+  const task = await prisma.task.update({
+    where: { id },
+    data: {
+      title,
+      description,
+    },
+  });
+
+  res.json(task);
+};
+
+export const deleteTask = async (req: AuthRequest, res: Response) => {
+  await prisma.task.delete({ where: { id: req.params.id } });
+  res.json({ message: "Deleted" });
 };

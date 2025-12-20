@@ -3,33 +3,25 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // or mysql / sqlite
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  email     String  @unique
+  email     String   @unique
   password  String
-
-  createdTasks  Task[] @relation("Creator")
-  assignedTasks Task[] @relation("Assignee")
+  tasks     Task[]
+  createdAt DateTime @default(now())
 }
 
 model Task {
   id          String   @id @default(uuid())
   title       String
   description String
-  dueDate     DateTime
-  priority    String
-  status      String
-
-  creatorId   String
-  assignedToId String
-
-  creator     User @relation("Creator", fields: [creatorId], references: [id])
-  assignedTo  User @relation("Assignee", fields: [assignedToId], references: [id])
-
+  status      String   @default("PENDING")
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
 }

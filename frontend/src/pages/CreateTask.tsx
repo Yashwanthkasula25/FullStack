@@ -5,6 +5,7 @@ import { createTask } from "../api/tasks";
 export default function CreateTask() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -13,31 +14,30 @@ export default function CreateTask() {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       setTitle("");
       setDescription("");
-      alert("Task created");
     },
   });
 
   return (
-    <div className="p-8 text-white">
+    <div className="bg-slate-900 p-4 rounded-lg space-y-3">
       <input
-        className="block mb-2 p-2 bg-slate-800"
-        placeholder="Title"
+        className="w-full p-2 rounded bg-slate-800 text-white"
+        placeholder="Task title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
 
       <textarea
-        className="block mb-2 p-2 bg-slate-800"
-        placeholder="Description"
+        className="w-full p-2 rounded bg-slate-800 text-white"
+        placeholder="Task description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
 
       <button
-        className="bg-red-500 px-4 py-2"
+        className="bg-red-600 px-4 py-2 rounded text-white"
         onClick={() => mutation.mutate({ title, description })}
       >
-        Create
+        Add Task
       </button>
     </div>
   );

@@ -1,12 +1,16 @@
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginInput } from "../utils/auth.schema";
 import { useMutation } from "@tanstack/react-query";
+
+import { loginSchema, type LoginInput } from "../utils/auth.schema";
 import { loginUser } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
+  const { login } = useAuth();          // ✅ hook inside component
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -16,19 +20,20 @@ export default function Login() {
   });
 
   const mutation = useMutation({
-  mutationFn: loginUser,
-  onSuccess: (data) => {
-    localStorage.setItem("token", data.access_token);
-    window.location.href = "/dashboard";
-  },
-  onError: () => {
-    alert("Invalid email or password");
-  },
-});
+    mutationFn: loginUser,
+    onSuccess: (res) => {
+      const token = res.data.access_token; // ✅ correct axios access
+      login(token);
+      navigate("/dashboard");
+    },
+    onError: () => {
+      alert("Invalid email or password");
+    },
+  });
 
   const onSubmit = (data: LoginInput) => {
-  mutation.mutate(data);
-};
+    mutation.mutate(data);
+  };
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -38,58 +43,44 @@ export default function Login() {
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Email */}
           <div>
             <label className="text-sm text-gray-300">Email</label>
             <input
-              type="email"
               {...register("email")}
-              className="w-full mt-1 px-4 py-2 rounded-md bg-slate-800 text-white border border-slate-700 focus:ring-2 focus:ring-red-500"
-              placeholder="you@example.com"
+              className="w-full mt-1 px-4 py-2 rounded-md bg-slate-800 text-white"
             />
             {errors.email && (
-              <p className="text-red-400 text-sm mt-1">
-                {errors.email.message}
-              </p>
+              <p className="text-red-400 text-sm">{errors.email.message}</p>
             )}
           </div>
 
-          {/* Password */}
           <div>
             <label className="text-sm text-gray-300">Password</label>
             <input
               type="password"
               {...register("password")}
-              className="w-full mt-1 px-4 py-2 rounded-md bg-slate-800 text-white border border-slate-700 focus:ring-2 focus:ring-red-500"
-              placeholder="••••••••"
+              className="w-full mt-1 px-4 py-2 rounded-md bg-slate-800 text-white"
             />
             {errors.password && (
-              <p className="text-red-400 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-red-400 text-sm">{errors.password.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="w-full bg-red-600 hover:bg-red-700 transition text-white font-semibold py-2 rounded-md"
+            className="w-full bg-red-600 text-white py-2 rounded-md"
           >
             {mutation.isPending ? "Logging in..." : "Login"}
           </button>
         </form>
 
         <p className="text-sm text-gray-400 text-center mt-4">
-  Don’t have an account?{" "}
-  <Link
-    to="/register"
-    className="text-red-500 hover:underline font-semibold"
-  >
-    Register
-  </Link>
-</p>
-
-
+          Don’t have an account?{" "}
+          <Link to="/register" className="text-red-500 font-semibold">
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   );
