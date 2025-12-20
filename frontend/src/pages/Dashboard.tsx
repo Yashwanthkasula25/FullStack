@@ -20,7 +20,7 @@ export default function Dashboard() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  /* FETCH TASKS */
+  /* ================= FETCH TASKS ================= */
   const {
     data: tasks = [],
     isLoading,
@@ -30,14 +30,14 @@ export default function Dashboard() {
     queryFn: getMyTasks,
   });
 
-  /* DELETE */
+  /* ================= DELETE ================= */
   const deleteMutation = useMutation({
     mutationFn: deleteTask,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
-  /* UPDATE */
+  /* ================= UPDATE ================= */
   const updateMutation = useMutation({
     mutationFn: updateTask,
     onSuccess: () => {
@@ -46,7 +46,7 @@ export default function Dashboard() {
     },
   });
 
-  /* TOGGLE STATUS */
+  /* ================= TOGGLE STATUS ================= */
   const toggleMutation = useMutation({
     mutationFn: toggleTask,
     onSuccess: () =>
@@ -98,7 +98,7 @@ export default function Dashboard() {
       )}
 
       <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-        {tasks.map((task) => (
+        {tasks.map((task: Task) => (
           <div
             key={task.id}
             className="bg-slate-900 p-4 rounded-lg flex justify-between items-center"
@@ -107,9 +107,7 @@ export default function Dashboard() {
               <div className="w-full">
                 <input
                   value={title}
-                  onChange={(e) =>
-                    setTitle(e.target.value)
-                  }
+                  onChange={(e) => setTitle(e.target.value)}
                   className="w-full mb-2 p-2 rounded bg-slate-800"
                 />
                 <textarea
@@ -128,9 +126,7 @@ export default function Dashboard() {
                     Save
                   </button>
                   <button
-                    onClick={() =>
-                      setEditingTask(null)
-                    }
+                    onClick={() => setEditingTask(null)}
                     className="bg-gray-600 px-3 py-1 rounded"
                   >
                     Cancel
@@ -141,16 +137,25 @@ export default function Dashboard() {
               <>
                 <div>
                   <h3
-  className={`font-semibold ${
-    task.status === "COMPLETED"
-      ? "line-through text-gray-400"
-      : "text-white"
-  }`}
->
-  {task.title}
-</h3>
-
-
+                    className={`font-semibold ${
+                      task.status === "COMPLETED"
+                        ? "line-through text-gray-400"
+                        : "text-white"
+                    }`}
+                  >
+                    {task.title}
+                  </h3>
+{/* Place this inside your task map loop, near the title */}
+<div className="flex gap-2 mt-1 mb-2">
+  <span className="text-xs bg-gray-700 text-white px-2 py-0.5 rounded">
+    {task.priority}
+  </span>
+  {task.dueDate && (
+    <span className="text-xs text-orange-400">
+      📅 {new Date(task.dueDate).toLocaleDateString()}
+    </span>
+  )}
+</div>
                   <p className="text-gray-400 text-sm">
                     {task.description}
                   </p>
@@ -159,22 +164,17 @@ export default function Dashboard() {
                 <div className="flex gap-2">
                   <button
   onClick={() => toggleMutation.mutate(task.id)}
-  className={`px-3 py-1 rounded ${
-    task.status === "COMPLETED"
-      ? "bg-yellow-600"
-      : "bg-green-600"
+  className={`px-3 py-1 rounded text-sm font-bold ${
+    task.status === "COMPLETED" 
+      ? "bg-yellow-600 text-black" 
+      : "bg-green-600 text-white"
   }`}
 >
-  {task.status === "COMPLETED"
-    ? "Mark Pending"
-    : "Mark Done"}
+  {task.status === "COMPLETED" ? "Re-open" : "Mark Done"}
 </button>
 
-
                   <button
-                    onClick={() =>
-                      startEdit(task)
-                    }
+                    onClick={() => startEdit(task)}
                     className="bg-blue-600 px-3 py-1 rounded"
                   >
                     Edit

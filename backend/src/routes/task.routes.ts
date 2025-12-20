@@ -5,7 +5,7 @@ import {
   getMyTasks,
   deleteTask,
   updateTask,
-  toggleTaskStatus,
+  toggleTask,
 } from "../controllers/task.controller";
 
 const router = Router();
@@ -16,6 +16,6 @@ router.post("/", createTask);
 router.get("/", getMyTasks);
 router.delete("/:id", deleteTask);
 router.put("/:id", updateTask);
-router.patch("/:id/toggle", toggleTaskStatus);
+router.patch("/:id/toggle", toggleTask);
 
 export default router;
